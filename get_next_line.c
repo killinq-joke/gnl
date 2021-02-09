@@ -6,25 +6,11 @@
 /*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 15:01:42 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/05 17:42:19 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/09 17:06:58 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-int		ft_isend_line(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\n')
-			return (1);
-		i++;
-	}
-	return (0);
-}
 
 int		ft_newline_index(char *buffer)
 {
@@ -67,59 +53,72 @@ int		get_next_line(int fd, char **line)
 	static char	*buffer;
 	char		*tmp;
 	int			ret;
-	
-	if (!(line = malloc(BUFFER_SIZE + 1)))
-		return (-1);
+
+	tmp = NULL;
+	*line = malloc(0);
 	if (buffer)
 	{
-		if (ft_newline_index(buffer) >= 0)
+		if (ft_newline_index(buffer) != -1)
 		{
-			ft_strlcpy(*line, buffer, ft_newline_index(buffer) + 1);
+			tmp = *line;
+			*line = ft_strndup(buffer, ft_newline_index(buffer));
+			free(tmp);
+			tmp = NULL;
 			tmp = buffer;
-			free(buffer);
-			if (!(buffer = malloc(BUFFER_SIZE + 1)))
-				return (-1);
-			buffer = ft_strdup(&buffer[ft_newline_index(buffer)]);
+			buffer = ft_strdup(&buffer[ft_newline_index(buffer) + 1]);
+			free(tmp);
+			tmp = NULL;
 			return (1);
 		}
-		*line = buffer;
+		else
+			*line = buffer;
 	}
 	if (!(buffer = malloc(BUFFER_SIZE + 1)))
 		return (-1);
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
 		buffer[ret] = '\0';
-		if (ft_newline_index(buffer) >= 0)
+		if (ft_newline_index(buffer) != -1)
 		{
-			ft_strlcpy(*line, buffer, ft_newline_index(buffer) + 1);
+			tmp = *line;
+			*line = ft_strjoin(*line, ft_strndup(buffer, ft_newline_index(buffer)));
+			free(tmp);
+			tmp = NULL;
 			tmp = buffer;
-			free(buffer);
-			if (!(buffer = malloc(BUFFER_SIZE + 1)))
-				return (-1);
-			buffer = ft_strdup(&buffer[ft_newline_index(buffer)]);
+			buffer = ft_strdup(&buffer[ft_newline_index(buffer) + 1]);
+			free(tmp);
+			tmp = NULL;
 			return (1);
 		}
-		tmp = *line;;
-		if (!(*line = malloc(ft_strlen(*line) + BUFFER_SIZE + 1)))
-			return (-1);
-		ft_strlcpy(*line, tmp, ft_strlen(tmp) + 1);
+		tmp = *line;
+		*line = ft_strjoin(*line, buffer);
 		free(tmp);
-		ft_strlcat(*line, buffer, ft_strlen(*line) + ft_strlen(buffer) + 1);
 	}
 	return (ret);
 }
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <fcntl.h>
 int main()
 {
-	int fd = open("fd.txt", O_RDONLY);
-	char *line;
+	int fd = open("fd", O_RDONLY);
+	//int fd = 0;
+	char *line = NULL;
+	int ret;
 
-	while ((get_next_line(fd, &line)) > 0)
+	ret = get_next_line(fd, &line);
+	while (ret > 0)
 	{
 		printf("\033[0;31m");
-		printf("%s\n", line);
+		printf("ret ===> %d\n", ret);
+		printf("\033[0m");
+		printf("line ====> %s\n", line);
+		free(line);
+		ret = get_next_line(fd, &line);
 	}
+	printf("\033[0;31m");
+	printf("ret ===> %d\n", ret);
+	printf("\033[0m");
 	return (0);
 }
+*/

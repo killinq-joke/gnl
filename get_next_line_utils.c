@@ -6,7 +6,7 @@
 /*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 16:52:32 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/05 17:27:03 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/09 15:57:15 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,25 +39,45 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t	len;
+	char	*join;
+	size_t	i;
+	size_t	j;
 
-	len = ft_strlen(src);
-	while (*dst && size)
+	if (!s1 || !s2 || !(join = malloc(ft_strlen(s1) + ft_strlen(s2) + 1)))
+		return (NULL);
+	i = 0;
+	while (s1[i])
 	{
-		dst++;
-		len++;
-		size--;
+		join[i] = s1[i];
+		i++;
 	}
-	while (*src && size > 1)
+	j = 0;
+	while (s2[j])
 	{
-		*dst++ = *src++;
-		size--;
+		join[i + j] = s2[j];
+		j++;
 	}
-	if (size)
-		*dst = 0;
-	return (len);
+	join[i + j] = '\0';
+	return (join);
+}
+
+char	*ft_strndup(const char *s1, int n)
+{
+	char	*duplicate;
+	int		i;
+
+	if (!(duplicate = malloc(n + 1)))
+		return (NULL);
+	i = 0;
+	while (s1[i] && i < n)
+	{
+		duplicate[i] = s1[i];
+		i++;
+	}
+	duplicate[i] = '\0';
+	return (duplicate);
 }
 
 char	*ft_strdup(const char *s1)
