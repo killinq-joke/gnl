@@ -6,7 +6,7 @@
 /*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 16:52:32 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/09 15:57:15 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/11 15:31:57 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,6 @@ size_t	ft_strlen(const char *s)
 	while (s[i])
 		i++;
 	return (i);
-}
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
-{
-	size_t i;
-
-	i = 0;
-	if (!dst || !src)
-		return (0);
-	while (size > 0 && src[i] && i < size - 1)
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	if (i < size)
-		dst[i] = '\0';
-	return (ft_strlen(src));
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -63,21 +46,21 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (join);
 }
 
-char	*ft_strndup(const char *s1, int n)
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	char	*duplicate;
-	int		i;
+	size_t i;
 
-	if (!(duplicate = malloc(n + 1)))
-		return (NULL);
 	i = 0;
-	while (s1[i] && i < n)
+	if (!dst || !src)
+		return (0);
+	while (size > 0 && src[i] && i < size - 1)
 	{
-		duplicate[i] = s1[i];
+		dst[i] = src[i];
 		i++;
 	}
-	duplicate[i] = '\0';
-	return (duplicate);
+	if (i < size)
+		dst[i] = '\0';
+	return (ft_strlen(src));
 }
 
 char	*ft_strdup(const char *s1)
@@ -95,4 +78,22 @@ char	*ft_strdup(const char *s1)
 	}
 	duplicate[i] = '\0';
 	return (duplicate);
+}
+
+char		*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char	*substr;
+	size_t	new_len;
+
+	if (!s)
+		return (NULL);
+	if (ft_strlen(s) < start)
+		return (ft_strdup(""));
+	new_len = ft_strlen(s) - start;
+	if (new_len < len)
+		len = new_len;
+	if (!(substr = (char *)malloc(sizeof(char) * (len + 1))))
+		return (NULL);
+	ft_strlcpy(substr, s + start, len + 1);
+	return (substr);
 }

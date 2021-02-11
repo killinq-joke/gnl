@@ -6,25 +6,11 @@
 /*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 15:01:42 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/09 17:06:58 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/11 15:33:15 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-int		ft_newline_index(char *buffer)
-{
-	int i;
-
-	i = 0;
-	while (buffer[i])
-	{
-		if (buffer[i] == '\n')
-			return (i);
-		i++;
-	}
-	return (-1);
-}
 
 /*
 ** s'il y a du buffer
@@ -48,56 +34,64 @@ int		ft_newline_index(char *buffer)
 **return (0);
 */
 
+char	*ft_strchr(const char *s, int c)
+{
+	int		i;
+	char	*res;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == (char)c)
+		{
+			res = (char*)&s[i];
+			return (res);
+		}
+		i++;
+	}
+	if (s[i] == (char)c)
+	{
+		res = (char*)&s[i];
+		return (res);
+	}
+	return (NULL);
+}
+
+#include <stdio.h>
 int		get_next_line(int fd, char **line)
 {
-	static char	*buffer;
+	char		buffer[BUFFER_SIZE + 1];
 	char		*tmp;
+	static char	*str = 0;
 	int			ret;
 
-	tmp = NULL;
-	*line = malloc(0);
-	if (buffer)
+	if (str == 0 && (ret = 0))
 	{
-		if (ft_newline_index(buffer) != -1)
-		{
-			tmp = *line;
-			*line = ft_strndup(buffer, ft_newline_index(buffer));
-			free(tmp);
-			tmp = NULL;
-			tmp = buffer;
-			buffer = ft_strdup(&buffer[ft_newline_index(buffer) + 1]);
-			free(tmp);
-			tmp = NULL;
-			return (1);
-		}
-		else
-			*line = buffer;
+		str = malloc(1);
+		str[0] = '\0';
 	}
-	if (!(buffer = malloc(BUFFER_SIZE + 1)))
-		return (-1);
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
-		buffer[ret] = '\0';
-		if (ft_newline_index(buffer) != -1)
+		if (ft_strchr(buffer, '\n'))
 		{
-			tmp = *line;
-			*line = ft_strjoin(*line, ft_strndup(buffer, ft_newline_index(buffer)));
-			free(tmp);
+			*line = ft_strjoin(str, ft_substr(buffer, 0, ft_strchr(buffer, '\n') - buffer));
+			free(str);
 			tmp = NULL;
 			tmp = buffer;
-			buffer = ft_strdup(&buffer[ft_newline_index(buffer) + 1]);
+			str = ft_strdup(ft_strchr(tmp, '\n') + 1);
 			free(tmp);
 			tmp = NULL;
 			return (1);
 		}
-		tmp = *line;
-		*line = ft_strjoin(*line, buffer);
+		tmp = str;
+		str = ft_strjoin(tmp, buffer);
 		free(tmp);
+		tmp = NULL;
 	}
 	return (ret);
 }
 
-/*#include <stdio.h>
+#include <stdio.h>
 #include <fcntl.h>
 int main()
 {
@@ -119,6 +113,6 @@ int main()
 	printf("\033[0;31m");
 	printf("ret ===> %d\n", ret);
 	printf("\033[0m");
+	while (1);
 	return (0);
 }
-*/
