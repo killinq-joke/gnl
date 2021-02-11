@@ -63,11 +63,11 @@ int		get_next_line(int fd, char **line)
 	char		*buffer;
 	char		*tmp;
 	static char	*str = NULL;
-	int			ret;
+	static int	ret = 1;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line || !(buffer = malloc(BUFFER_SIZE + 1)))
 		return (-1);
-	if ((ret = 1) && str == 0)
+	if (str == 0)
 		str = ft_strdup("\0");
 	if (ft_strchr(str, '\n'))
 	{
@@ -99,6 +99,7 @@ int		get_next_line(int fd, char **line)
 		free(tmp);
 		tmp = NULL;
 	}
+	*line = str;
 	return (ret);
 }
 
@@ -124,5 +125,6 @@ int main()
 	printf("\033[0;31m");
 	printf("ret ===> %d\n", ret);
 	printf("\033[0m");
+	printf("line ====> %s\n", line);
 	return (0);
 }
