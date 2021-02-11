@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: ztouzri <ztouzri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 15:01:42 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/11 15:33:15 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/11 17:36:04 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,21 +60,23 @@ char	*ft_strchr(const char *s, int c)
 #include <stdio.h>
 int		get_next_line(int fd, char **line)
 {
-	char		buffer[BUFFER_SIZE + 1];
+	char		*buffer;
 	char		*tmp;
-	static char	*str = 0;
+	static char	*str = NULL;
 	int			ret;
 
-	if (str == 0 && (ret = 0))
-	{
-		str = malloc(1);
-		str[0] = '\0';
-	}
+	if (fd < 0 || BUFFER_SIZE < 1 || !line || !(buffer = malloc(BUFFER_SIZE + 1)))
+		return (-1);
+	if ((ret = 1) && str == 0)
+		str = ft_strdup("\0");
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
+		buffer[ret] = '\0';
 		if (ft_strchr(buffer, '\n'))
 		{
-			*line = ft_strjoin(str, ft_substr(buffer, 0, ft_strchr(buffer, '\n') - buffer));
+			tmp = ft_substr(buffer, 0, ft_strchr(buffer, '\n') - buffer);
+			*line = ft_strjoin(str, tmp);
+			free(tmp);
 			free(str);
 			tmp = NULL;
 			tmp = buffer;
@@ -113,6 +115,5 @@ int main()
 	printf("\033[0;31m");
 	printf("ret ===> %d\n", ret);
 	printf("\033[0m");
-	while (1);
 	return (0);
 }
