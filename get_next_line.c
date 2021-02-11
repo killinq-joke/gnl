@@ -69,6 +69,15 @@ int		get_next_line(int fd, char **line)
 		return (-1);
 	if ((ret = 1) && str == 0)
 		str = ft_strdup("\0");
+	if (ft_strchr(str, '\n'))
+	{
+		tmp = str;
+		*line = ft_substr(str, 0, ft_strchr(str, '\n') - str); 
+		str = ft_strdup(ft_strchr(tmp, '\n') + 1);
+		free(tmp);
+		return (1);
+
+	}
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
 		buffer[ret] = '\0';
