@@ -6,7 +6,7 @@
 /*   By: ztouzri <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 16:52:32 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/15 09:42:51 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/15 17:14:17 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ char	*ft_strdup(const char *s1)
 	return (duplicate);
 }
 
-char		*ft_substr(char const *s, unsigned int start, size_t len)
+char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*substr;
 	size_t	new_len;
