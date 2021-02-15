@@ -6,7 +6,7 @@
 /*   By: ztouzri <ztouzri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 15:01:42 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/11 17:36:04 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/15 10:16:07 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,27 +34,20 @@
 **return (0);
 */
 
-char	*ft_strchr(const char *s, int c)
+int		nlindex(char *str)
 {
-	int		i;
-	char	*res;
+	int i;
 
 	i = 0;
-	while (s[i])
+	if (!str)
+		return (-1);
+	while (str[i])
 	{
-		if (s[i] == (char)c)
-		{
-			res = (char*)&s[i];
-			return (res);
-		}
+		if (str[i] == '\n')
+			return (i);
 		i++;
 	}
-	if (s[i] == (char)c)
-	{
-		res = (char*)&s[i];
-		return (res);
-	}
-	return (NULL);
+	return (-1);
 }
 
 #include <stdio.h>
@@ -62,45 +55,29 @@ int		get_next_line(int fd, char **line)
 {
 	char		*buffer;
 	char		*tmp;
-	static char	*str = NULL;
-	static int	ret = 1;
+	static char	*str;
+	int			ret;
 
-	if (fd < 0 || BUFFER_SIZE < 1 || !line || !(buffer = malloc(BUFFER_SIZE + 1)))
+	if (fd < 0 || BUFFER_SIZE < 1 || !line ||
+			!(buffer = malloc(BUFFER_SIZE + 1)))
 		return (-1);
-	if (str == 0)
-		str = ft_strdup("\0");
-	if (ft_strchr(str, '\n'))
-	{
-		tmp = str;
-		*line = ft_substr(str, 0, ft_strchr(str, '\n') - str); 
-		str = ft_strdup(ft_strchr(tmp, '\n') + 1);
-		free(tmp);
-		return (1);
-
-	}
-	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
+	if ((ret = 1) && !str)
+		str = ft_strdup("");
+	while (nlindex(str) == -1 && ((ret = read(fd, buffer, BUFFER_SIZE)) > 0))
 	{
 		buffer[ret] = '\0';
-		if (ft_strchr(buffer, '\n'))
-		{
-			tmp = ft_substr(buffer, 0, ft_strchr(buffer, '\n') - buffer);
-			*line = ft_strjoin(str, tmp);
-			free(tmp);
-			free(str);
-			tmp = NULL;
-			tmp = buffer;
-			str = ft_strdup(ft_strchr(tmp, '\n') + 1);
-			free(tmp);
-			tmp = NULL;
-			return (1);
-		}
-		tmp = str;
-		str = ft_strjoin(tmp, buffer);
-		free(tmp);
-		tmp = NULL;
+		tmp = ft_strjoin(str, buffer);
+		free(str);
+		str = tmp;
 	}
-	*line = str;
-	return (ret);
+	if (ret == 0)
+		*line = ft_strdup(str);
+	else if (ret > 0)
+		*line = ft_substr(str, 0, nlindex(str));
+	else
+		return (-1);
+	str = ft_strdup(&str[ft_strlen(*line) + 1]);
+	return (ret != 0);
 }
 
 #include <stdio.h>
@@ -126,5 +103,6 @@ int main()
 	printf("ret ===> %d\n", ret);
 	printf("\033[0m");
 	printf("line ====> %s\n", line);
+	free(line);
 	return (0);
 }
