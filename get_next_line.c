@@ -6,7 +6,7 @@
 /*   By: ztouzri <ztouzri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 15:01:42 by ztouzri           #+#    #+#             */
-/*   Updated: 2021/02/15 10:16:07 by ztouzri          ###   ########.fr       */
+/*   Updated: 2021/02/15 16:18:09 by ztouzri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,25 +50,41 @@ int		nlindex(char *str)
 	return (-1);
 }
 
+int		ft_free(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (*str)
+	{
+		while (str[i])
+		{
+			str[i] = '\0';
+			i++;
+		}
+		free(str);
+		str = NULL;
+		return (1);
+	}
+	return (0);
+}
+
 #include <stdio.h>
 int		get_next_line(int fd, char **line)
 {
-	char		*buffer;
+	static char *str = NULL;
 	char		*tmp;
-	static char	*str;
+	char		*buffer;
 	int			ret;
 
-	if (fd < 0 || BUFFER_SIZE < 1 || !line ||
-			!(buffer = malloc(BUFFER_SIZE + 1)))
+	if ((ret = 1) && (fd < 0 || BUFFER_SIZE < 1
+				|| !line || !(buffer = malloc(BUFFER_SIZE + 1))))
 		return (-1);
-	if ((ret = 1) && !str)
-		str = ft_strdup("");
-	while (nlindex(str) == -1 && ((ret = read(fd, buffer, BUFFER_SIZE)) > 0))
+	str == NULL ? str = malloc(0) : NULL;
+	while (nlindex(str) == -1 && (ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
 		buffer[ret] = '\0';
-		tmp = ft_strjoin(str, buffer);
-		free(str);
-		str = tmp;
+		str = ft_strjoin(str, buffer);
 	}
 	if (ret == 0)
 		*line = ft_strdup(str);
@@ -76,11 +92,13 @@ int		get_next_line(int fd, char **line)
 		*line = ft_substr(str, 0, nlindex(str));
 	else
 		return (-1);
-	str = ft_strdup(&str[ft_strlen(*line) + 1]);
-	return (ret != 0);
+	tmp = ft_strdup(&str[nlindex(str) + 1]);
+	free(str);
+	str = tmp;
+	return (ret == 0 ? 0 : 1);
 }
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <fcntl.h>
 int main()
 {
@@ -105,4 +123,4 @@ int main()
 	printf("line ====> %s\n", line);
 	free(line);
 	return (0);
-}
+}*/
